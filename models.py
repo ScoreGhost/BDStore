@@ -40,7 +40,7 @@ class Product(db):
     """
     __tablename__ = "products"
     id = Column(Integer, primary_key=True)
-    product = Column(String)
+    name = Column(String)
     price = Column(String)
     description = Column(String)
     stock = Column(Integer)
@@ -48,7 +48,7 @@ class Product(db):
     color = Column(String)
 
     def __repr__(self):
-        return f"<User(product={self.product},price={self.price},description={self.description},stock={self.stock},lenght={self.lenght},color={self.color} ,)>"
+        return f"<User(name={self.name},price={self.price},description={self.description},stock={self.stock},lenght={self.lenght},color={self.color} ,)>"
     
 class Cart(db):
     """
@@ -56,7 +56,7 @@ class Cart(db):
     """
     __tablename__ = "cart"
     id = Column(Integer, primary_key=True)
-    creation_date = Column(Date, default=datetime.utcnow)  # Automatically set the creation date
+    creation_date = Column(Date, default=datetime.datetime.utcnow)  # Automatically set the creation date
 
     def __repr__(self):
         return f"<Cart(creation_date={self.creation_date}, relation_cart_item={self.relation_cart_item})>"
@@ -84,7 +84,7 @@ class Order(db):
     """
     __tablename__ = "orders"
     id = Column(Integer, primary_key=True)
-    creation_date = Column(Date, default=datetime.utcnow)
+    creation_date = Column(Date, default=datetime.datetime.utcnow)
     total_ammount = Column(Integer)
     status = Column(String)
     client_info = Column(String)
@@ -101,7 +101,7 @@ class OrderItem(db):
     quantity = Column(Integer)
     price = Column(Integer)
 
-    order_id = Column(Integer, ForeignKey("order.id"))
+    order_id = Column(Integer, ForeignKey("orders.id"))
     order = relationship(Order, backref="order_items")
 
     products_id = Column(Integer, ForeignKey("products.id"))
@@ -109,4 +109,9 @@ class OrderItem(db):
 
     def __repr__(self):
         return f"<Order(relation_order={self.relation_order},relation_product={self.relation_product},quantity={self.quantity},price={self.price})>"
-              
+
+if __name__ == "__main__":
+    dildo_mario = Product(name="MarioPP",price=100, description="Plumbers best PP for your pleasure", stock=20,lenght=16, color="red and blue")
+
+
+    
