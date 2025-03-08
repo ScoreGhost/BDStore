@@ -2,7 +2,7 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-from models import db, User, Address
+from models import db, User, Address,Product
 
 from flask import Flask, request, jsonify
 from addreses import address_api
@@ -45,6 +45,39 @@ def create_user():
     session.commit()
     return jsonify({"message": "User created successfully"}), 201
 
+@api.route("/products", methods=["POST"])
+def create_products():
+    """
+    Create a new products in the database with the provided data.
+    """
+    data = request.get_json()
+    new_product = Product(name=data["name"], price=data["price"], description=data["description"], stock=data["stock"], lenght=data["lenght"], color=data["color"])
+    session.add(new_product)
+    session.commit()
+    return jsonify({"message": "Product created successfully"}), 201
+
+@api.route("/products", methods=["GET"])
+def get_products():
+    """
+    Retrieve all products from the database and return them in JSON format.
+    """
+    products = session.query(Product).all()
+
+    productos_en_formato_diccionario = []
+
+    for product in products:
+        product_dict = {
+            "id": product.id,
+            "name": product.name,
+            "price": product.price,
+            "description": product.description,
+            "stock": product.stock,
+            "lenght": product.lenght,
+            "color": product.color,
+        }
+        productos_en_formato_diccionario.append(product_dict)
+
+    return jsonify(productos_en_formato_diccionario)
 
 if __name__ == "__main__":
     api.run(port=5000, debug=True)
