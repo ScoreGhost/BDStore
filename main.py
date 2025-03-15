@@ -109,6 +109,16 @@ def add_carts_item(id):
     session.commit()
     return jsonify({"message": "Cart has items added successfully"}), 201
 
+@api.route("/carts/<int:id>/items/<int:item_id>", methods=["DELETE"])
+def delete_carts_items_by(id,item_id):
+    """
+    Delete a carts items in the database with the provided data.
+    """
+    search_cart_item = session.query(CartItem).get(item_id)
+    session.delete(search_cart_item)
+    session.commit()
+    return jsonify({"message": "Cart item deleted successfully"}), 201
+
 @api.route("/carts", methods=["POST"])
 def create_cart():
     """
