@@ -2,7 +2,7 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-from models import Cart, db, User, Address,Product
+from models import Cart, db, User, Address, Product, CartItem
 
 from flask import Flask, request, jsonify
 from addreses import address_api
@@ -83,6 +83,31 @@ def delete_carts(id):
     session.delete(search_cart)
     session.commit()
     return jsonify({"message": "Cart deleted successfully"}), 201
+
+
+@api.route("/carts/<int:id>", methods=["GET"])
+def get_carts_by(id):
+    """
+    Get a new carts ID in the database with the provided data.
+    """
+    search_cart = session.query(Cart).get(id)
+    
+    return jsonify(search_cart.serialize()), 200
+
+@api.route("/carts/<int:id>/items", methods=["POST"])
+def add_carts_item(id):
+    """
+    Adds items to carts in the database with the provided data.
+    """
+    search_cart = session.query(Cart).get(id)
+    data = request.get_json()
+    product_id = data.get("product_id")
+    search_product = session.query(Product).get(product_id)
+    quantity = data.get("quantity")
+    new_cart_item = CartItem(quantity=quantity,cart=search_cart,products=search_product)
+    session.add(new_cart_item)
+    session.commit()
+    return jsonify({"message": "Cart has items added successfully"}), 201
 
 @api.route("/carts", methods=["POST"])
 def create_cart():

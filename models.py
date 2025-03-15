@@ -61,6 +61,13 @@ class Cart(db):
     def __repr__(self):
         return f"<Cart(creation_date={self.creation_date}, relation_cart_item={self.relation_cart_item})>"
     
+    def serialize(self):
+        return {
+            "id":self.id,
+            "creation_date":self.creation_date,
+            "cart_items":[item.serialize() for item in self.cart_items]
+        }
+    
 class CartItem(db):
     """
     Represents the CartItems of the buyer in the database.
@@ -73,10 +80,17 @@ class CartItem(db):
     cart = relationship(Cart, backref="cart_items")
 
     products_id = Column(Integer, ForeignKey("products.id"))
-    products = relationship(Product)
+    products = relationship(Product, backref="cart_items")
 
     def __repr__(self):
         return f"<CartItem(relation_cart={self.relation_cart}, relation_product={self.relation_product}, quantity={self.quantity})>"    
+    
+    def serialize(self):
+        return {
+            "id":self.id,
+            "quantity":self.quantity,
+            "product":self.products.name if self.products else "There's nothing here"
+        }
     
 class Order(db):
     """
@@ -112,6 +126,7 @@ class OrderItem(db):
 
 if __name__ == "__main__":
     dildo_mario = Product(name="MarioPP",price=100, description="Plumbers best PP for your pleasure", stock=20,lenght=16, color="red and blue")
+
 
 
     
