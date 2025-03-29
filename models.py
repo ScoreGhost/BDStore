@@ -41,7 +41,7 @@ class Product(db):
     __tablename__ = "products"
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    price = Column(String)
+    price = Column(Integer)
     description = Column(String)
     stock = Column(Integer)
     lenght = Column(Integer)
@@ -65,8 +65,13 @@ class Cart(db):
         return {
             "id":self.id,
             "creation_date":self.creation_date,
-            "cart_items":[item.serialize() for item in self.cart_items]
+            "cart_items":[item.serialize() for item in self.cart_items],
+            "total": self.gettotal()
         }
+    
+    def gettotal(self):
+        shoplist=[(item.quantity * int(item.products.price)) for item in self.cart_items]
+        return sum(shoplist)
     
 class CartItem(db):
     """
@@ -89,7 +94,7 @@ class CartItem(db):
         return {
             "id":self.id,
             "quantity":self.quantity,
-            "product":self.products.name if self.products else "There's nothing here"
+            "product":self.products.name if self.products else "There's nothing hereg"
         }
     
 class Order(db):

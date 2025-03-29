@@ -2,7 +2,7 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-from models import Cart, db, User, Address, Product, CartItem
+from models import Cart, db, User, Address, Product, CartItem, Order
 
 from flask import Flask, request, jsonify
 from addreses import address_api
@@ -109,6 +109,7 @@ def add_carts_item(id):
     session.commit()
     return jsonify({"message": "Cart has items added successfully"}), 201
 
+
 @api.route("/carts/<int:id>/items/<int:item_id>", methods=["DELETE"])
 def delete_carts_items_by(id,item_id):
     """
@@ -129,6 +130,43 @@ def create_cart():
     session.add(new_cart)
     session.commit()
     return jsonify({"message": "Cart created successfully"}), 201
+
+@api.route("/orders", methods=["POST"])
+def create_orders():
+    """
+    Create a new orders in the database with the provided data.
+    """
+    data = request.get_json()
+    cart_id = data.get("cart_id")
+    search_cart = session.query(Cart).get(cart_id)
+    total = search_cart.gettotal()
+    new_order = Order(total_ammount=total, status="pending", client_info="Lucho")
+    session.add(new_order)
+    session.commit()
+    return jsonify({"message": "Order created successfully"}), 201
+
+@api.route("/orders", methods=["GET"])
+def get_orders():
+    """
+    Retrieve all orders from the database and return them in JSON format.
+    """
+    orders = session.query(Order).all()
+
+    ordenes_en_formato_diccionario = []
+
+    for order in orders:
+        order_dict = {
+            "id": order.id,
+            "client_info": order.client_info,
+            "total_ammount": order.total_ammount
+            
+        }
+        ordenes_en_formato_diccionario.append(order_dict)
+
+    return jsonify(ordenes_en_formato_diccionario)
+
+
+
 
 @api.route("/products/<int:id>", methods=["DELETE"])
 def delete_products(id):
