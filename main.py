@@ -165,6 +165,53 @@ def get_orders():
 
     return jsonify(ordenes_en_formato_diccionario)
 
+@api.route("/orders/<int:id>", methods=["GET"])
+def search_single_order_by_(id):
+    """
+   Search an existing order in the database with the provided data.
+    """
+    # Step 1: Get the order to update
+    order = session.query(Order).get(id)
+
+    # Step 2: Check if the order exists
+    if not order:
+        return jsonify({"message": "Order not found"}), 404
+    
+    order_dict = {
+            "id": order.id,
+            "client_info": order.client_info,
+            "total_ammount": order.total_ammount,
+            "status": order.status
+        }
+
+    return jsonify(order_dict)
+
+@api.route("/orders/<int:id>", methods=["PUT"])
+def update_order(id):
+    """
+    Update an existing order in the database with the provided data.
+    """
+    # Step 1: Get the order to update
+    order_to_update = session.query(Order).get(id)
+
+    # Step 2: Check if the order exists
+    if not order_to_update:
+        return jsonify({"message": "Order not found"}), 404
+
+    # Step 3: Get the updated data from the request
+    data = request.get_json()
+
+    # Step 4: Update the product fields
+    if "status" in data:
+        order_to_update.status = data["status"]
+    
+
+    # Step 5: Commit the changes to the database
+    session.commit()
+
+    # Step 6: Return a success message
+    return jsonify({"message": "order updated successfully"}), 200
+
 
 
 
